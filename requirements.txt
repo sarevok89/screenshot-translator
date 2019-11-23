@@ -1,0 +1,5 @@
+boto3==1.10.26
+numpy==1.17.3
+opencv-python==4.1.1.26
+pyscreenshot==0.5.1
+pytesseract==0.3.0

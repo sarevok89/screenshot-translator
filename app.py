@@ -78,18 +78,26 @@ class MyApp:
         # cv2.imshow('Screenshot', grayscale_img)
         # cv2.waitKey()
         # cv2.destroyAllWindows()
-        text = pytesseract.image_to_string(grayscale_img, lang='eng')
-        self.translate_text(text)
+        ocr_result = pytesseract.image_to_string(grayscale_img, lang='eng')
+        self.translate_text(ocr_result)
 
-    def translate_text(self, text):
-        if len(text) > 0:
-            translate = boto3.client(
+    def translate_text(self, ocr_result):
+        if ocr_result:
+            text = ocr_result.replace('\n', ' ')
+            translator = boto3.client(
                 'translate', region_name='eu-central-1'
             )
-            result = translate.translate_text(Text=text,
-                                              SourceLanguageCode="en",
-                                              TargetLanguageCode="pl")
-            self.display_message(result.get('TranslatedText'))
+            if not ocr_result.endswith(('.', '?')):
+                text = text + '.'
+
+            result = translator.translate_text(Text=text,
+                                               SourceLanguageCode="en",
+                                               TargetLanguageCode="pl")
+
+            translation = result.get('TranslatedText')
+            if not ocr_result.endswith(('.', '?')):
+                translation = translation[:-1]
+            self.display_message(translation)
         else:
             self.display_message()
 
